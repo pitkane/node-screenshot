@@ -1,6 +1,6 @@
 var express = require("express");
 var multer = require("multer");
-var upload = multer({ dest: "uploads/" });
+// var upload = multer({ dest: "uploads/" });
 var morgan = require("morgan");
 var bodyParser = require("body-parser");
 
@@ -33,7 +33,6 @@ var bodyParser = require("body-parser");
 
 var webshot = require("webshot");
 var moment = require("moment");
-var sleep = require("sleep");
 
 let result = (async function() {
   var url =
@@ -56,8 +55,8 @@ let result = (async function() {
 
   var iterationCycle = 1;
 
-  for (var index = 0; index < 10000; index++) {
-    var filename = pad(iterationCycle, 6); // 0010
+  for (var index = 0; index < 50000; index++) {
+    var filename = pad(iterationCycle, 8); // 0010
     filename = filename + "_" + moment().format("DD-MM-YYY-HHss") + ".png";
     console.log(filename);
 
