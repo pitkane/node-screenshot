@@ -32,26 +32,56 @@ var bodyParser = require("body-parser");
 // });
 
 var webshot = require("webshot");
+var moment = require("moment");
+var sleep = require("sleep");
 
-const url =
-  "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
-const filename = "00001.png";
+let result = (async function() {
+  var url =
+    "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
+  // var filename = "screenshots/00001.png";
 
-var options = {
-  // screenSize: {
-  //   width: 320,
-  //   height: 480
-  // },
-  // shotSize: {
-  //   width: 320,
-  //   height: "all"
-  // },
-  renderDelay: 5000,
-  userAgent:
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
-};
+  var options = {
+    // screenSize: {
+    //   width: 320,
+    //   height: 480
+    // },
+    // shotSize: {
+    //   width: 320,
+    //   height: "all"
+    // },
+    renderDelay: 5000,
+    userAgent:
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
+  };
 
-webshot(url, filename, function(err) {
-  // screenshot now saved to google.png
-  console.log("Done");
-});
+  var iterationCycle = 1;
+
+  for (var index = 0; index < 10000; index++) {
+    var filename = pad(iterationCycle, 6); // 0010
+    filename = filename + "_" + moment().format("DD-MM-YYY-HHss") + ".png";
+    console.log(filename);
+
+    await takeScreenshot(url, filename, options);
+
+    iterationCycle += 1;
+  }
+})();
+
+function takeScreenshot(url, filename, options) {
+  return new Promise((resolve, reject) => {
+    webshot(url, "screenshots/" + filename, options, function(err) {
+      if (err) {
+        console.log(err);
+        return reject();
+      }
+      console.log(`Screenshot taken: ${filename}`);
+      return resolve();
+    });
+  });
+}
+
+function pad(n, width, z) {
+  z = z || "0";
+  n = n + "";
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
