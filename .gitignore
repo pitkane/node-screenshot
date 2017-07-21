@@ -1,0 +1,11 @@
+.env
+node_modules/
+logs/
+tmp/
+process.pid
+process-*.pid
+dump.rdb
+.DS_Store
+npm-debug.log
+locales/*.json
+newrelic_agent.log
