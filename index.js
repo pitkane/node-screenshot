@@ -1,13 +1,12 @@
-require('dotenv').config()
+require("dotenv").config();
 
 const fs = require("fs"); //Load the filesystem module
-const axios = require('axios')
-
+const axios = require("axios");
 
 const webshot = require("webshot");
 const moment = require("moment");
 
-let result = (async function () {
+let result = (async function() {
   var url =
     "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
   // var filename = "screenshots/00001.png";
@@ -22,12 +21,13 @@ let result = (async function () {
     //   height: "all"
     // },
     renderDelay: 5000,
-    userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
+    userAgent:
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
   };
 
   var iterationCycle = 1;
   var initialFileSize = 0;
-  var errorRaised = false
+  var errorRaised = false;
 
   for (var index = 0; index < 50000; index++) {
     var filename = pad(iterationCycle, 8); // 0010
@@ -37,27 +37,29 @@ let result = (async function () {
 
     const fileSize = await takeScreenshot(url, filename, options);
     if (iterationCycle === 1) {
-      initialFileSize = fileSize
+      initialFileSize = fileSize;
     } else {
       // if the difference is more than 10KB
       if (fileSize + 10000 < initialFileSize) {
-        errorRaised = true
-        console.log("THE PAGE IS BROKEN!!!")
-        const timestamp = moment().format("HH:mm:ss")
+        errorRaised = true;
+        console.log("THE PAGE IS BROKEN!!!");
+        const timestamp = moment().format("HH:mm:ss");
         const payload = {
-          text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on rikki :( -- " + timestamp,
+          text:
+            "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on rikki :( -- " +
+            timestamp,
           icon_emoji: ":ghost:"
         };
-        await sendStatusText(payload)
+        await sendStatusText(payload);
       } else {
         if (errorRaised == true) {
-          const timestamp = moment().format("HH:mm:ss")
+          const timestamp = moment().format("HH:mm:ss");
           const payload = {
             text: "ja taas toimii! -- " + timestamp,
             icon_emoji: ":ghost:"
           };
-          await sendStatusText(payload)
-          errorRaised = false
+          await sendStatusText(payload);
+          errorRaised = false;
         }
       }
       // 285052
@@ -68,16 +70,15 @@ let result = (async function () {
   }
 })();
 
-
 function takeScreenshot(url, filename, options) {
   return new Promise((resolve, reject) => {
-    const filePath = "screenshots/" + filename
-    webshot(url, filePath, options, function (shot, err) {
+    const filePath = "screenshots/" + filename;
+    webshot(url, filePath, options, function(shot, err) {
       if (err) {
         console.log(err);
         return reject();
       }
-      const fileSize = getFilesizeInBytes(filePath)
+      const fileSize = getFilesizeInBytes(filePath);
       console.log(`Screenshot taken: ${filename}, with size: ${fileSize}`);
       return resolve(fileSize);
     });
@@ -92,7 +93,7 @@ function pad(n, width, z) {
 
 function sendStatusText(payload) {
   return new Promise((resolve, reject) => {
-    const slackURL = process.env.SLACK_WEBHOOK_URL
+    const slackURL = process.env.SLACK_WEBHOOK_URL;
 
     // send request to Slack
     axios
@@ -107,7 +108,11 @@ function sendStatusText(payload) {
 }
 
 function getFilesizeInBytes(filename) {
-  const stats = fs.statSync(filename)
-  const fileSizeInBytes = stats.size
-  return fileSizeInBytes
+  try {
+    const stats = fs.statSync(filename);
+  } catch (error) {
+    console.log("Shhhh, its ok", error);
+  }
+  const fileSizeInBytes = stats.size;
+  return fileSizeInBytes;
 }
