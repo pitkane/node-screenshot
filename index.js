@@ -57,7 +57,7 @@ let result = (async function() {
 
   for (var index = 0; index < 50000; index++) {
     var filename = pad(iterationCycle, 8); // 0010
-    filename = filename + "_" + moment().format("DD-MM-YYY-HHss") + ".png";
+    filename = filename + "_" + moment().format("DD-MM-YYY-HHmmss") + ".png";
     console.log(filename);
 
     await takeScreenshot(url, filename, options);
