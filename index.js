@@ -109,9 +109,10 @@ function sendStatusText(payload) {
 
 function getFilesizeInBytes(filename) {
   try {
-    const stats = fs.statSync(filename);
+    var stats = fs.statSync(filename);
   } catch (error) {
     console.log("Shhhh, its ok", error);
+    return 100000;
   }
   const fileSizeInBytes = stats.size;
   return fileSizeInBytes;
