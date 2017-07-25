@@ -1,44 +1,11 @@
-var express = require("express");
-var multer = require("multer");
-// var upload = multer({ dest: "uploads/" });
-var morgan = require("morgan");
-var bodyParser = require("body-parser");
-
-const fs = require("fs"); //Load the filesystem module
-
-var axios = require('axios')
-
 require('dotenv').config()
 
-// var app = express();
-// app.use(morgan("dev"));
+const fs = require("fs"); //Load the filesystem module
+const axios = require('axios')
 
-// // parse application/x-www-form-urlencoded
-// app.use(bodyParser.urlencoded({ extended: false }));
 
-// // parse application/json
-// app.use(bodyParser.json());
-
-// app.get("/", function(req, res, next) {
-//   return res.status(200).send("pong");
-// });
-
-// app.post("/upload", upload.any(), function(req, res, next) {
-//   // req.file is the `avatar` file
-//   // req.body will hold the text fields, if there were any
-
-//   console.log(req.body, "Body");
-//   console.log(req.files, "files");
-
-//   return res.status(200).send("nice");
-// });
-
-// app.listen(4000, function() {
-//   console.log("Yep 4000!");
-// });
-
-var webshot = require("webshot");
-var moment = require("moment");
+const webshot = require("webshot");
+const moment = require("moment");
 
 let result = (async function () {
   var url =
