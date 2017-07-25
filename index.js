@@ -57,7 +57,8 @@ let result = (async function() {
 
   for (var index = 0; index < 50000; index++) {
     var filename = pad(iterationCycle, 8); // 0010
-    filename = filename + "_" + moment().format("DD-MM-YYY-HHss") + ".png";
+    // filename = filename + "_" + moment().format("DD-MM-YYY-HHss") + ".png";
+    filename = filename + "_" + moment().format("DD-MM-YYY-HHmmss") + ".png";
     console.log(filename);
 
     await takeScreenshot(url, filename, options);
@@ -83,4 +84,26 @@ function pad(n, width, z) {
   z = z || "0";
   n = n + "";
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+}
+
+function sendStatusText() {
+  return new Promise((resolve, reject) => {
+    const slackURL =
+      "https://hooks.slack.com/services/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";
+    var payload = {
+      text:
+        "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on taas alhaalla :(",
+      icon_emoji: ":ghost:"
+    };
+
+    // send request to Slack
+    axios
+      .post(slackURL, payload)
+      .then(response => {
+        resolve(response);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 }
