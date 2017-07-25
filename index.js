@@ -6,6 +6,8 @@ var bodyParser = require("body-parser");
 
 const fs = require("fs"); //Load the filesystem module
 
+require('dotenv').config()
+
 // var app = express();
 // app.use(morgan("dev"));
 
@@ -104,9 +106,8 @@ function pad(n, width, z) {
 
 function sendStatusText() {
   return new Promise((resolve, reject) => {
-    const slackURL =
-      "https://hooks.slack.com/services/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";
-    var payload = {
+    const slackURL = process.env.SLACK_WEBHOOK_URL
+    const payload = {
       text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on taas rikki :(",
       icon_emoji: ":ghost:"
     };
