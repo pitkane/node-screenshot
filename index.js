@@ -45,7 +45,7 @@ let result = (async function () {
         console.log("THE PAGE IS BROKEN!!!")
         const timestamp = moment().format("HH:mm:ss")
         const payload = {
-          text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on taas rikki :( -- " + timestamp,
+          text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on rikki :( -- " + timestamp,
           icon_emoji: ":ghost:"
         };
         await sendStatusText(payload)
