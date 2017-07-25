@@ -4,6 +4,8 @@ var multer = require("multer");
 var morgan = require("morgan");
 var bodyParser = require("body-parser");
 
+const fs = require("fs"); //Load the filesystem module
+
 // var app = express();
 // app.use(morgan("dev"));
 
@@ -34,7 +36,7 @@ var bodyParser = require("body-parser");
 var webshot = require("webshot");
 var moment = require("moment");
 
-let result = (async function() {
+let result = (async function () {
   var url =
     "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
   // var filename = "screenshots/00001.png";
@@ -49,11 +51,11 @@ let result = (async function() {
     //   height: "all"
     // },
     renderDelay: 5000,
-    userAgent:
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
+    userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
   };
 
   var iterationCycle = 1;
+  var initialFileSize = 0
 
   for (var index = 0; index < 50000; index++) {
     var filename = pad(iterationCycle, 8); // 0010
@@ -61,21 +63,35 @@ let result = (async function() {
     filename = filename + "_" + moment().format("DD-MM-YYY-HHmmss") + ".png";
     console.log(filename);
 
-    await takeScreenshot(url, filename, options);
+    const fileSize = await takeScreenshot(url, filename, options);
+    if (iterationCycle === 1) {
+      initialFileSize = fileSize
+    } else {
+      // if the difference is more than 10KB
+      if (fileSize + 10000 < initialFileSize) {
+        console.log("THE PAGE IS BROKEN!!!")
+        await sendStatusText()
+      }
+      // 285052
+      // 258728
+    }
 
     iterationCycle += 1;
   }
 })();
 
+
 function takeScreenshot(url, filename, options) {
   return new Promise((resolve, reject) => {
-    webshot(url, "screenshots/" + filename, options, function(err) {
+    const filePath = "screenshots/" + filename
+    webshot(url, filePath, options, function (shot, err) {
       if (err) {
         console.log(err);
         return reject();
       }
-      console.log(`Screenshot taken: ${filename}`);
-      return resolve();
+      const fileSize = getFilesizeInBytes(filePath)
+      console.log(`Screenshot taken: ${filename}, with size: ${fileSize}`);
+      return resolve(fileSize);
     });
   });
 }
@@ -91,8 +107,7 @@ function sendStatusText() {
     const slackURL =
       "https://hooks.slack.com/services/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";
     var payload = {
-      text:
-        "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on taas alhaalla :(",
+      text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on taas rikki :(",
       icon_emoji: ":ghost:"
     };
 
@@ -106,4 +121,10 @@ function sendStatusText() {
         reject(error);
       });
   });
+}
+
+function getFilesizeInBytes(filename) {
+  const stats = fs.statSync(filename)
+  const fileSizeInBytes = stats.size
+  return fileSizeInBytes
 }
