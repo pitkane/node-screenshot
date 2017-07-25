@@ -6,6 +6,8 @@ var bodyParser = require("body-parser");
 
 const fs = require("fs"); //Load the filesystem module
 
+var axios = require('axios')
+
 require('dotenv').config()
 
 // var app = express();
@@ -57,7 +59,8 @@ let result = (async function () {
   };
 
   var iterationCycle = 1;
-  var initialFileSize = 0
+  var initialFileSize = 0;
+  var errorRaised = false
 
   for (var index = 0; index < 50000; index++) {
     var filename = pad(iterationCycle, 8); // 0010
@@ -71,8 +74,24 @@ let result = (async function () {
     } else {
       // if the difference is more than 10KB
       if (fileSize + 10000 < initialFileSize) {
+        errorRaised = true
         console.log("THE PAGE IS BROKEN!!!")
-        await sendStatusText()
+        const timestamp = moment().format("HH:mm:ss")
+        const payload = {
+          text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on taas rikki :( -- " + timestamp,
+          icon_emoji: ":ghost:"
+        };
+        await sendStatusText(payload)
+      } else {
+        if (errorRaised == true) {
+          const timestamp = moment().format("HH:mm:ss")
+          const payload = {
+            text: "ja taas toimii! -- " + timestamp,
+            icon_emoji: ":ghost:"
+          };
+          await sendStatusText(payload)
+          errorRaised = false
+        }
       }
       // 285052
       // 258728
@@ -104,13 +123,9 @@ function pad(n, width, z) {
   return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
-function sendStatusText() {
+function sendStatusText(payload) {
   return new Promise((resolve, reject) => {
     const slackURL = process.env.SLACK_WEBHOOK_URL
-    const payload = {
-      text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on taas rikki :(",
-      icon_emoji: ":ghost:"
-    };
 
     // send request to Slack
     axios
