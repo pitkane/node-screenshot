@@ -6,7 +6,7 @@ const axios = require("axios");
 const webshot = require("webshot");
 const moment = require("moment");
 
-let result = (async function() {
+let result = (async function () {
   var url =
     "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
   // var filename = "screenshots/00001.png";
@@ -21,8 +21,7 @@ let result = (async function() {
     //   height: "all"
     // },
     renderDelay: 5000,
-    userAgent:
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
+    userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
   };
 
   var iterationCycle = 1;
@@ -35,18 +34,25 @@ let result = (async function() {
     filename = filename + "_" + moment().format("DD-MM-YYY-HHmmss") + ".png";
     console.log(filename);
 
-    const fileSize = await takeScreenshot(url, filename, options);
+    try {
+      var fileSize = await takeScreenshot(url, filename, options);
+    } catch (error) {
+      console.log(error)
+      // next loop
+      continue;
+    }
+
     if (iterationCycle === 1) {
       initialFileSize = fileSize;
     } else {
       // if the difference is more than 10KB
-      if (fileSize + 10000 < initialFileSize) {
+      // if (fileSize + 10000 < initialFileSize) {
+      if (Math.abs(fileSize - initialFileSize) > 10000) {
         errorRaised = true;
         console.log("THE PAGE IS BROKEN!!!");
         const timestamp = moment().format("HH:mm:ss");
         const payload = {
-          text:
-            "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on rikki :( -- " +
+          text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on rikki :( -- " +
             timestamp,
           icon_emoji: ":ghost:"
         };
@@ -73,12 +79,17 @@ let result = (async function() {
 function takeScreenshot(url, filename, options) {
   return new Promise((resolve, reject) => {
     const filePath = "screenshots/" + filename;
-    webshot(url, filePath, options, function(shot, err) {
+    webshot(url, filePath, options, function (shot, err) {
       if (err) {
         console.log(err);
         return reject();
       }
-      const fileSize = getFilesizeInBytes(filePath);
+
+      try {
+        var fileSize = getFilesizeInBytes(filePath);
+      } catch (error) {
+        return reject("Screenshot was ok, but filesize calculation failed")
+      }
       console.log(`Screenshot taken: ${filename}, with size: ${fileSize}`);
       return resolve(fileSize);
     });
@@ -112,7 +123,7 @@ function getFilesizeInBytes(filename) {
     var stats = fs.statSync(filename);
   } catch (error) {
     console.log("Shhhh, its ok", error);
-    return 100000;
+    throw Error('Failed to get file size');
   }
   const fileSizeInBytes = stats.size;
   return fileSizeInBytes;
