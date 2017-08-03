@@ -9,8 +9,8 @@ const moment = require("moment");
 var urlFromParams = process.argv[2];
 
 let result = (async function () {
-  var url =
-    "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
+  // var url =
+  //   "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
   // var filename = "screenshots/00001.png";
 
   var options = {
@@ -37,7 +37,7 @@ let result = (async function () {
     console.log(filename);
 
     try {
-      var fileSize = await takeScreenshot(url, filename, options);
+      var fileSize = await takeScreenshot(urlFromParams, filename, options);
     } catch (error) {
       console.log(error)
       // next loop
@@ -46,11 +46,11 @@ let result = (async function () {
 
     if (iterationCycle === 1) {
       initialFileSize = fileSize;
-        const payload = {
-          text: "Aloitetaan sivun <https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi - Laakkeet-ja-e-reseptit> renderöintilooppaus",
-          icon_emoji: ":ghost:"
-        };
-        await sendStatusText(payload);
+      const payload = {
+        text: `Aloitetaan sivun ${urlFromParams} renderöintilooppaus`,
+        icon_emoji: ":ghost:"
+      };
+      await sendStatusText(payload);
 
     } else {
       // if the difference is more than 10KB
