@@ -6,6 +6,8 @@ const axios = require("axios");
 const webshot = require("webshot");
 const moment = require("moment");
 
+var urlFromParams = process.argv[2];
+
 let result = (async function () {
   var url =
     "https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti";
@@ -20,7 +22,7 @@ let result = (async function () {
     //   width: 320,
     //   height: "all"
     // },
-    renderDelay: 5000,
+    renderDelay: 10000,
     userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:54.0) Gecko/20100101 Firefox/54.0"
   };
 
@@ -44,6 +46,12 @@ let result = (async function () {
 
     if (iterationCycle === 1) {
       initialFileSize = fileSize;
+        const payload = {
+          text: "Aloitetaan sivun <https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi - Laakkeet-ja-e-reseptit> renderöintilooppaus",
+          icon_emoji: ":ghost:"
+        };
+        await sendStatusText(payload);
+
     } else {
       // if the difference is more than 10KB
       // if (fileSize + 10000 < initialFileSize) {
