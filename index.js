@@ -7,6 +7,7 @@ const webshot = require("webshot");
 const moment = require("moment");
 
 var urlFromParams = process.argv[2];
+var hostname = getHostName(urlFromParams)
 
 let result = (async function () {
   // var url =
@@ -60,8 +61,7 @@ let result = (async function () {
         console.log("THE PAGE IS BROKEN!!!");
         const timestamp = moment().format("HH:mm:ss");
         const payload = {
-          text: "<https://www.yliopistonverkkoapteekki.fi/epages/KYA.sf/fi_FI/?ObjectPath=/Shops/KYA/Categories/Laakkeet-ja-e-resepti|yliopistonverkkoapteekki.fi> on rikki :( -- " +
-            timestamp,
+          text: `<${hostname}> on rikki :( -- ${timestamp}`,
           icon_emoji: ":ghost:"
         };
         await sendStatusText(payload);
@@ -69,7 +69,7 @@ let result = (async function () {
         if (errorRaised == true) {
           const timestamp = moment().format("HH:mm:ss");
           const payload = {
-            text: "ja taas toimii! -- " + timestamp,
+            text: `ja taas toimii ${hostname}! -- ${timestamp}`,
             icon_emoji: ":ghost:"
           };
           await sendStatusText(payload);
@@ -135,4 +135,14 @@ function getFilesizeInBytes(filename) {
   }
   const fileSizeInBytes = stats.size;
   return fileSizeInBytes;
+}
+
+
+function getHostName(url) {
+  var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+  if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
+    return match[2];
+  } else {
+    return null;
+  }
 }
