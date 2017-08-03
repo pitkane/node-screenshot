@@ -7,7 +7,8 @@ const webshot = require("webshot");
 const moment = require("moment");
 
 var urlFromParams = process.argv[2];
-var hostname = getHostName(urlFromParams)
+var hostname = getHostName(urlFromParams);
+var folderName = process.argv[3];
 
 let result = (async function () {
   // var url =
@@ -86,7 +87,8 @@ let result = (async function () {
 
 function takeScreenshot(url, filename, options) {
   return new Promise((resolve, reject) => {
-    const filePath = "screenshots/" + filename;
+    const filePath = folderName + filename;
+    console.log(filePath);
     webshot(url, filePath, options, function (shot, err) {
       if (err) {
         console.log(err);

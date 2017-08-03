@@ -10,3 +10,4 @@ npm-debug.log
 locales/*.json
 newrelic_agent.log
 screenshots/
+screenshots2/
